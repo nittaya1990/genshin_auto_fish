@@ -1,4 +1,6 @@
 # Introduction
+**现已支持不同分辨率屏幕**
+
 原神自动钓鱼AI由[YOLOX](https://github.com/Megvii-BaseDetection/YOLOX), DQN两部分模型组成。使用迁移学习，半监督学习进行训练。
 模型也包含一些使用opencv等传统数字图像处理方法实现的不可学习部分。
 
@@ -11,10 +13,10 @@
 
 打开anaconda prompt(命令行界面)，创建新python环境并激活:
 ```shell
-conda create -n ysfish python=3.6
+conda create -n ysfish python=3.8
 conda activate ysfish
 ```
-推荐安装<font color=#66CCFF>**python3.7或以下**</font>版本。
+推荐安装<font color=#66CCFF>**python3.8或以下**</font>版本。
 
 ## 下载工程代码
 使用git下载，[git安装教程](https://www.cnblogs.com/xiaoliu66/p/9404963.html):
@@ -38,7 +40,9 @@ python requirements.py
 pip install -U pip
 python requirements.py --cuda [cuda版本]
 #例如安装的CUDA11.x
-python requirements.py --cuda 110
+python requirements.py --cuda 111
+#或者使用代理加速
+python requirements.py --cuda 111 --proxy http://127.0.0.1:1080 # use proxy to speed up
 ```
 可能会有Time out之类的报错，多试几遍，github太卡。
 
@@ -49,8 +53,28 @@ python setup.py develop
 ```
 
 ## 预训练权重下载
-下载预训练[权重](https://github.com/7eu7d7/genshin_auto_fish/releases/tag/weights) (.pth文件),[yolox_tiny.pth](https://github.com/Megvii-BaseDetection/YOLOX/releases/download/0.1.1rc0/yolox_tiny.pth)
+
+- [`best_tiny3.pth`](https://github.com/7eu7d7/genshin_auto_fish/releases/download/weights/best_tiny3.pth)
+- [`fish_genshin_net.pth`](https://github.com/7eu7d7/genshin_auto_fish/releases/download/weights/fish_genshin_net.pth)
+- [`fish_sim_net.pth`](https://github.com/7eu7d7/genshin_auto_fish/releases/download/weights/fish_sim_net.pth)
+- [`yolox_tiny.pth`](https://github.com/Megvii-BaseDetection/YOLOX/releases/download/0.1.1rc0/yolox_tiny.pth)
+
 下载后将权重文件放在 <font color=#66CCFF>**工程目录/weights**</font> 下
+
+# 运行钓鱼AI
+原神需要以1080x1920的分辨率运行，分辨率高的屏幕可以开窗口模式。
+
+命令行窗口一定要以<font color=#66CCFF>**管理员权限**</font>启动
+
+显卡加速
+```shell
+python fishing.py image -f yolox/exp/yolox_tiny_fish.py -c weights/best_tiny3.pth --conf 0.25 --nms 0.45 --tsize 640 --device gpu
+```
+cpu运行
+```shell
+python fishing.py image -f yolox/exp/yolox_tiny_fish.py -c weights/best_tiny3.pth --conf 0.25 --nms 0.45 --tsize 640 --device cpu
+```
+运行后出现**init ok**后按r键开始钓鱼，原神需要全屏。出于性能考虑检测框不会实时显示，处理运算后台进行。
 
 # YOLOX训练工作流程
 <**只用来钓鱼不需要训练，直接用预训练权重就可以**>
@@ -82,16 +106,3 @@ python train_sim.py
 ```shell
 python train.py
 ```
-
-# 运行钓鱼AI
-命令行窗口一定要以<font color=#66CCFF>**管理员权限**</font>启动
-
-显卡加速
-```shell
-python fishing.py image -f yolox/exp/yolox_tiny_fish.py -c weights/best_tiny3.pth --conf 0.25 --nms 0.45 --tsize 640 --device gpu
-```
-cpu运行
-```shell
-python fishing.py image -f yolox/exp/yolox_tiny_fish.py -c weights/best_tiny3.pth --conf 0.25 --nms 0.45 --tsize 640 --device cpu
-```
-运行后出现**init ok**后按r键开始钓鱼，原神需要全屏。出于性能考虑检测框不会实时显示，处理运算后台进行。
